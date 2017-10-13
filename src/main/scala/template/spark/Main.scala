@@ -9,18 +9,21 @@ object Main extends InitSpark {
   def main(args: Array[String]) = {
     import spark.implicits._
 
-    val version = spark.version
-    println("SPARK VERSION = " + version)
+    // Load up each line of the ratings data into an RDD
+    val lines = sc.textFile("/Users/gargam/Projects/spark-scala/ml-100k/u.data")
 
-    val sumHundred = spark.range(1, 101).reduce(_ + _)
-    println(f"Sum 1 to 100 = $sumHundred")
+    // Convert each line to a string, split it out by tabs, and extract the third field.
+    // (The file format is userID, movieID, rating, timestamp)
+    val ratings = lines.map(x => x.toString().split("\t")(2))
 
-    println("Reading from csv file: people-example.csv")
-    val persons = reader.csv("people-example.csv").as[Person]
-    persons.show(2)
-    val averageAge = persons.agg(avg("age"))
-                     .first.get(0).asInstanceOf[Double]
-    println(f"Average Age: $averageAge%.2f")
+    // Count up how many times each value (rating) occurs
+    val results = ratings.countByValue()
+
+    // Sort the resulting map of (rating, count) tuples
+    val sortedResults = results.toSeq.sortBy(_._1)
+
+    // Print each result on its own line.
+    sortedResults.foreach(println)
 
     close
   }

@@ -2,8 +2,9 @@ package template.spark
 
 import org.apache.log4j.{Level, LogManager, Logger}
 import org.apache.spark.sql.SparkSession
-
+import org.apache.log4j.PropertyConfigurator
 trait InitSpark {
+  PropertyConfigurator.configure("./log4j.properties")
   val spark: SparkSession = SparkSession.builder()
                             .appName("Spark example")
                             .master("local[*]")
