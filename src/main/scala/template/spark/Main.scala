@@ -1,6 +1,9 @@
 package template.spark
 
 import org.apache.spark.sql.functions._
+import org.apache.spark.ml.linalg.{Matrix, Vectors}
+import org.apache.spark.ml.stat.Correlation
+import org.apache.spark.sql.Row
 
 final case class Person(firstName: String, lastName: String,
                         country: String, age: Int)
@@ -9,21 +12,19 @@ object Main extends InitSpark {
   def main(args: Array[String]) = {
     import spark.implicits._
 
-    // Load up each line of the ratings data into an RDD
-    val lines = sc.textFile("/Users/gargam/Projects/spark-scala/ml-100k/u.data")
+    val data = Seq(
+      Vectors.sparse(4, Seq((0, 1.0), (3, -2.0))),
+      Vectors.dense(4.0, 5.0, 0.0, 3.0),
+      Vectors.dense(6.0, 7.0, 0.0, 8.0),
+      Vectors.sparse(4, Seq((0, 9.0), (3, 1.0)))
+    )
 
-    // Convert each line to a string, split it out by tabs, and extract the third field.
-    // (The file format is userID, movieID, rating, timestamp)
-    val ratings = lines.map(x => x.toString().split("\t")(2))
+    val df = data.map(Tuple1.apply).toDF("features")
+    val Row(coeff1: Matrix) = Correlation.corr(df, "features").head
+    println(s"Pearson correlation matrix:\n $coeff1")
 
-    // Count up how many times each value (rating) occurs
-    val results = ratings.countByValue()
-
-    // Sort the resulting map of (rating, count) tuples
-    val sortedResults = results.toSeq.sortBy(_._1)
-
-    // Print each result on its own line.
-    sortedResults.foreach(println)
+    val Row(coeff2: Matrix) = Correlation.corr(df, "features", "spearman").head
+    println(s"Spearman correlation matrix:\n $coeff2")
 
     close
   }
