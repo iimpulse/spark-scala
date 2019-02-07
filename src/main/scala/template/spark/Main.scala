@@ -1,6 +1,5 @@
 package template.spark
 
-import org.apache.spark.sql.functions._
 import org.apache.spark.ml.linalg.{Matrix, Vectors}
 import org.apache.spark.ml.stat.Correlation
 import org.apache.spark.sql.Row
@@ -9,7 +8,7 @@ final case class Person(firstName: String, lastName: String,
                         country: String, age: Int)
 
 object Main extends InitSpark {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
     import spark.implicits._
 
     val data = Seq(
@@ -26,6 +25,6 @@ object Main extends InitSpark {
     val Row(coeff2: Matrix) = Correlation.corr(df, "features", "spearman").head
     println(s"Spearman correlation matrix:\n $coeff2")
 
-    close
+    close()
   }
 }
