@@ -12,7 +12,7 @@ Credit To: https://github.com/faizanahemad/spark-gradle-template.git`
 ## Install
 `Scala Plug In for Intellij`
 ### Clone the Repo
-`git clone ssh://git@bitbucket.jax.org:7999/tes/spark-scala.git`
+`git clone https://github.com/iimpulse/spark-scala.git`
 ### Building a JAR
 `./gradlew clean build`
 ### Run
